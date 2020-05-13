@@ -40,4 +40,17 @@ main() {
 
     expect(invoice.send(), throwsA(TypeMatcher<AuthException>()));
   });
+
+  test('submit incomplete invoice, expect InvalidInvoice Exception', () async {
+    // login
+    await Auth.instance.initialize(testing: true);
+
+    final fromWallet = Wallet(id: Uuid('00000000-0000-0000-0000-000000000001'));
+
+    final invoice = Invoice()
+      ..from = fromWallet
+      ..amount = Amount(12);
+
+    expect(invoice.send(), throwsA(TypeMatcher<InvalidInvoiceException>()));
+  });
 }
