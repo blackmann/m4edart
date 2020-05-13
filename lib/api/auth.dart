@@ -32,18 +32,21 @@ class Auth {
   Future<User> initialize({bool testing = false}) async {
     final authCredentials = await getSavedCredentials();
 
-    requests.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
-      // TODO: provide accurate urls
-      options.baseUrl =
-          testing ? 'https://bascule-staging.herokuapp.com' : 'https://bascule-live.herokuapp.com';
+    requests.interceptors.add(
+      InterceptorsWrapper(onRequest: (RequestOptions options) async {
+        // TODO: provide accurate urls
+        options.baseUrl = testing
+            ? 'https://bascule-staging.herokuapp.com'
+            : 'https://bascule-live.herokuapp.com';
 
-      options.headers = {
-        'Authorization': 'Bearer ${authCredentials.bearerToken}',
-        'Content-Type': 'application/json'
-      };
+        options.headers = {
+          'Authorization': 'Bearer ${authCredentials.bearerToken}',
+          'Content-Type': 'application/json'
+        };
 
-      return options;
-    }));
+        return options;
+      }),
+    );
 
     _user = User(id: authCredentials.userId);
 

@@ -1,18 +1,30 @@
 import 'package:meta/meta.dart';
 import 'package:uuid_type/uuid_type.dart';
+import 'package:m4edart/api/auth.dart';
+import 'package:m4edart/api/exceptions.dart';
+import 'package:m4edart/constants.dart';
+import 'package:m4edart/api/rest.dart' as rest;
 
 class Wallet {
   final Uuid id;
   WalletInfo walletInfo;
 
-  Wallet({@required this.id});
+  Wallet({@required this.id, this.walletInfo});
 
+  /// Returns the details of this wallet.
+  ///
+  /// Throws `AuthException` if there is no user initialized for the app.
+  ///
   Future<WalletInfo> getWalletInfo() async {
     if (walletInfo != null) {
       return walletInfo;
     }
 
-    throw UnimplementedError();
+    if (Auth.instance.getUser() == null) {
+      throw AuthException(message: ExceptionMessages.kNoAuthUser);
+    }
+
+    return await rest.getWalletInfo(id);
   }
 }
 
@@ -33,12 +45,25 @@ class WalletType {
 
   @override
   int get hashCode => _type.hashCode;
+
+  @override
+  String toString() => _type;
 }
 
 class WalletInfo {
   final String label;
   final String currency;
-  final WalletType walletType;
+  final WalletType type;
 
-  WalletInfo({@required this.label, @required this.currency, this.walletType = WalletType.bascule});
+  WalletInfo(
+      {@required this.label,
+      @required this.currency,
+      this.type = WalletType.bascule});
+
+  static WalletInfo fromMap(Map<String, dynamic> data) {
+    return WalletInfo(
+        label: data['label'],
+        currency: data['currency'],
+        type: WalletType.parse(data['type']));
+  }
 }

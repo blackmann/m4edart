@@ -18,18 +18,25 @@ main() {
     final fromWallet = Wallet(id: Uuid('00000000-0000-0000-0000-000000000001'));
     final toWallet = wallets[0];
 
-    final invoice = Invoice(from: fromWallet, to: toWallet, amount: Amount(value: 3));
+    final invoice = Invoice()
+      ..from = fromWallet
+      ..to = toWallet
+      ..amount = Amount(7);
 
     final transaction = await invoice.send();
 
     expect(transaction.status, equals(TransactionStatus.pending));
   });
 
-  test('make payment without initializing auth, expect AuthException', () async {
+  test('make payment without initializing auth, expect AuthException',
+      () async {
     final fromWallet = Wallet(id: Uuid('00000000-0000-0000-0000-000000000001'));
     final toWallet = Wallet(id: Uuid('00000000-0000-0000-0000-000000000002'));
 
-    final invoice = Invoice(from: fromWallet, to: toWallet, amount: Amount(value: 3));
+    final invoice = Invoice()
+      ..from = fromWallet
+      ..to = toWallet
+      ..amount = Amount(7);
 
     expect(invoice.send(), throwsA(TypeMatcher<AuthException>()));
   });
